@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:document-processing-api="http://www.mulesoft.org/schema/mule/document-processing-api"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/document-processing-api http://www.mulesoft.org/schema/mule/document-processing-api/current/mule-document-processing-api.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<flow name="email-attachmentFlow" doc:id="e533a217-8498-4cff-b257-9e873843a604" >
+		<scheduler doc:name="Scheduler" doc:id="a8692980-4190-46be-801a-05d4a1aaef61" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="60" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<email:list-imap doc:name="List - IMAP" doc:id="9c686306-aa3f-4bbc-91f2-9b1b43bf9d9f" config-ref="Email_IMAP">
+			<email:imap-matcher seen="EXCLUDE"/>
+		</email:list-imap>
+		<foreach doc:name="For Each" doc:id="c61271aa-bed0-4c5b-b90d-8b956e38a1d6" collection="payload">
+			<choice doc:name="Choice" doc:id="e5f51e2c-9293-458a-b1b3-ad1bf226400c" >
+				<when expression="#[(sizeOf(payload.attachments) &gt; 0) and (match(payload.attachments[0].^mediaType, '(.*);.*')[1] == 'image/jpeg')]">
+					<ee:transform doc:name="Transform Message" doc:id="f880dd93-7d95-4af3-b368-1ae99cd7032d">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://validationnamespace.raml.org
+import * from dw::core::Binaries
+
+var fromAddressArray = attributes.fromAddresses[0] match(/.*<(.*)>.*/)
+
+---
+{
+	ns0#root: {
+		ns0#file1: toBase64(payload.attachments[0] as Binary),
+		ns0#emailAddress: fromAddressArray[1] as String,
+		ns0#keywords: p('secure::document.keywords'),
+		ns0#language: "en",
+		ns0#contentType: vars.mediaData[1],
+		ns0#filename: vars.mediaData[2],
+		ns0#fileEncoding: 'base64'	
+	}
+}]]></ee:set-payload>
+				</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="emailId" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.id]]></ee:set-variable>
+						</ee:variables>
+			</ee:transform>
+					<document-processing-api:create-docuement doc:name="Create docuement" doc:id="00dfaa01-7b4c-4c04-90f6-15b835f547be" client-id="${secure::document.client_id}" client-secret="${secure::document.client_secret}" config-ref="Document_Processing_API_Config" />
+					<email:mark-as-read doc:name="Mark email as read" doc:id="26173aeb-707f-4588-adbb-de1fbcd5e0ed" config-ref="Email_IMAP" emailId="#[vars.emailId]"/>
+					<logger level="INFO" doc:name="Logger" doc:id="8520e971-58fa-44a5-a258-c8bc8c262a91" message="#[output application/json --- payload]" />
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="Logger" doc:id="735de865-a172-49f3-8fd2-b14ccd321654" message="No attachments"/>
+				</otherwise>
+			</choice>
+		</foreach>
+	</flow>
+</mule>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:document-processing-api="http://www.mulesoft.org/schema/mule/document-processing-api"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/document-processing-api http://www.mulesoft.org/schema/mule/document-processing-api/current/mule-document-processing-api.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="4d43aab8-0880-41a2-a402-5e51850b903c" file="config.yaml" key="${config.key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<document-processing-api:config name="Document_Processing_API_Config" doc:name="Document Processing API Config" doc:id="1dcb6246-f6c1-4c77-8a32-2a1d7b565c21" property_host="${secure::document.host}" property_port="${secure::document.port}" property_basePath="${secure::document.base_path}" property_protocol="${secure::document.protocol}"/>
+	<tls:context name="TLS_Context" doc:name="TLS Context" doc:id="8a0910e0-fe40-4323-86b8-186093c1b34b" enabledProtocols="TLSv1.2">
+		<tls:trust-store path="keystore.jks" password="password" type="jks" insecure="true"/>
+		<tls:key-store type="jks" path="keystore,jks" alias="mule" keyPassword="password" password="password"/>
+	</tls:context>
+	<email:imap-config name="Email_IMAP" doc:name="Email IMAP" doc:id="97188a3a-156a-4567-ae23-647e687e778f" >
+		<email:imaps-connection host="${secure::email.host}" port="${secure::email.port}" user="${secure::email.user}" password="${secure::email.password}" tlsContext="TLS_Context" />
+	</email:imap-config>	
+</mule>
