@@ -15,6 +15,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 			</scheduling-strategy>
 		</scheduler>
 		<email:list-imap doc:name="List - IMAP" doc:id="9c686306-aa3f-4bbc-91f2-9b1b43bf9d9f" config-ref="Email_IMAP">
+			<reconnect />
 			<email:imap-matcher seen="EXCLUDE"/>
 		</email:list-imap>
 		<foreach doc:name="For Each" doc:id="c61271aa-bed0-4c5b-b90d-8b956e38a1d6" collection="payload">
@@ -66,8 +67,8 @@ var fromAddressArray = attributes.fromAddresses[0] match(/.*<(.*)>.*/)
 	}
 }]]></ee:set-payload>
 				</ee:message>
-						<ee:variables >
-							<ee:set-variable variableName="emailId" ><![CDATA[%dw 2.0
+						<ee:variables>
+							<ee:set-variable variableName="emailId"><![CDATA[%dw 2.0
 output application/java
 ---
 attributes.id]]></ee:set-variable>
@@ -84,7 +85,9 @@ attributes.id]]></ee:set-variable>
 					<document-processing-api:create-docuement doc:name="Create docuement" doc:id="00dfaa01-7b4c-4c04-90f6-15b835f547be" client-id="${secure::document.client_id}" client-secret="${secure::document.client_secret}" config-ref="Document_Processing_API_Config" />
 					<choice doc:name="Choice" doc:id="2c865e51-8364-449a-8d95-b9ceba1cd846" >
 						<when expression="#[attributes.statusCode == 201]">
-							<email:mark-as-read doc:name="Mark email as read" doc:id="26173aeb-707f-4588-adbb-de1fbcd5e0ed" config-ref="Email_IMAP" emailId="#[vars.emailId]" />
+							<email:mark-as-read doc:name="Mark email as read" doc:id="26173aeb-707f-4588-adbb-de1fbcd5e0ed" config-ref="Email_IMAP" emailId="#[vars.emailId]">
+								<reconnect />
+							</email:mark-as-read>
 							<tracking:custom-event doc:name="Marked email as processed" doc:id="08392d20-4016-4f00-b29e-48a51a42b9f1" event-name="Marked email as processed">
 								<tracking:meta-data key="Status Code" value="#[attributes.statusCode]" />
 								<tracking:meta-data key="Step" value="MArking email as processed" />
