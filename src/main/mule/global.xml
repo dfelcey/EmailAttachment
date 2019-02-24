@@ -22,5 +22,6 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 				<reconnect />
 			</reconnection>
 		</email:imaps-connection>
-	</email:imap-config>	
+	</email:imap-config>
+	<global-property doc:name="Global Property" doc:id="43d5a607-e6e0-4d41-a284-bcadad72c4ba" name="defaultResponseTimeout" value="30000" />	
 </mule>
