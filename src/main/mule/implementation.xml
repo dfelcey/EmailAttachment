@@ -57,13 +57,13 @@ var fromAddressArray = attributes.fromAddresses[0] match(/.*<(.*)>.*/)
 ---
 {
 	ns0#root: {
-		ns0#file1: toBase64(payload.attachments[0] as Binary),
 		ns0#emailAddress: fromAddressArray[1] as String,
-		ns0#keywords: p('secure::document.keywords'),
+		ns0#keywords: p('document.keywords'),
 		ns0#language: "en",
 		ns0#contentType: vars.attachmentType,
 		ns0#filename: vars.attachmentName,
-		ns0#fileEncoding: 'base64'	
+		ns0#fileEncoding: 'base64',
+		ns0#file1: toBase64(payload.attachments[0] as Binary)
 	}
 }]]></ee:set-payload>
 				</ee:message>

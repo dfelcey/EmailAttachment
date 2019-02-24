@@ -23,5 +23,6 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 			</reconnection>
 		</email:imaps-connection>
 	</email:imap-config>
-	<global-property doc:name="Global Property" doc:id="43d5a607-e6e0-4d41-a284-bcadad72c4ba" name="defaultResponseTimeout" value="30000" />	
+	<global-property doc:name="Global Property" doc:id="43d5a607-e6e0-4d41-a284-bcadad72c4ba" name="defaultResponseTimeout" value="30000" />
+	<configuration-properties doc:name="Configuration properties" doc:id="0623f626-dcab-4c5b-925d-c53f868fde0e" file="config.yaml" />	
 </mule>
