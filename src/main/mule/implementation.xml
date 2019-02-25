@@ -90,7 +90,7 @@ attributes.id]]></ee:set-variable>
 							</email:mark-as-read>
 							<tracking:custom-event doc:name="Marked email as processed" doc:id="08392d20-4016-4f00-b29e-48a51a42b9f1" event-name="Marked email as processed">
 								<tracking:meta-data key="Status Code" value="#[attributes.statusCode]" />
-								<tracking:meta-data key="Step" value="MArking email as processed" />
+								<tracking:meta-data key="Step" value="Marking email as processed" />
 							</tracking:custom-event>
 							<logger level="INFO" doc:name="Logger" doc:id="8520e971-58fa-44a5-a258-c8bc8c262a91" message="Email processed" />
 						</when>
